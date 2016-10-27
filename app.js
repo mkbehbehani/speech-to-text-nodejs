@@ -44,6 +44,15 @@ var config = extend({
 
 var authService = watson.authorization(config);
 
+// Create the service wrapper
+var toneAnalyzer = watson.tone_analyzer({
+  url: 'https://gateway.watsonplatform.net/tone-analyzer/api/',
+  username: process.env.TA_USERNAME || '<username>',
+  password: process.env.TA_PASSWORD || '<password>',
+  version_date: '2016-05-19',
+  version: 'v3'
+});
+
 app.get('/', function(req, res) {
   res.render('index', {
     ct: req._csrfToken,
@@ -58,6 +67,15 @@ app.post('/api/token', function(req, res, next) {
       next(err);
     else
       res.send(token);
+  });
+});
+
+app.post('/api/tone', function(req, res, next) {
+  toneAnalyzer.tone(req.body, function(err, data) {
+    if (err) {
+      return next(err);
+    }
+    return res.json(data);
   });
 });
 
